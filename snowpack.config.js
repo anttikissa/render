@@ -3,19 +3,20 @@
 
 /** @type {import("snowpack").SnowpackUserConfig } */
 module.exports = {
-  mount: {
-    /* ... */
-  },
-  plugins: [
-    /* ... */
-  ],
-  packageOptions: {
-    /* ... */
-  },
-  devOptions: {
-    /* ... */
-  },
-  buildOptions: {
-    /* ... */
-  },
-};
+	exclude: [
+		'**/node_modules/**/*',
+		'**/dev',
+		'**/build'
+	],
+	mount: {
+	},
+	plugins: [
+	],
+	packageOptions: {
+	},
+	devOptions: {
+	},
+	buildOptions: {
+		out: 'dist'
+	},
+}
