@@ -6,7 +6,8 @@ module.exports = {
 	exclude: [
 		'**/node_modules/**/*',
 		'**/dev',
-		'**/build'
+		'**/build',
+		'**/deploy'
 	],
 	mount: {
 	},

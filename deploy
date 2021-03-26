@@ -1,0 +1,14 @@
+#!/bin/bash
+
+cd "$(dirname "$0")"
+
+./build
+VERSION=`git rev-parse main | cut -b1-8`
+
+echo "Version $VERSION"
+
+TARGET=`cat .deploy-target`/$VERSION
+
+echo "Deploy to $TARGET"
+
+scp -r dist $TARGET
