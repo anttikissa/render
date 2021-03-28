@@ -1,4 +1,6 @@
-import { App } from "./App"
+import { App } from './App'
+let log = console.log
 
 let app = App()
-document.body.appendChild(app)
+
+app(document.body)

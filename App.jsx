@@ -8,7 +8,7 @@ import { val, render } from './framework.js'
 
 export function App() {
 	let name = val('')
-	let nameLength = name.map(value => value.length)
+	let nameLength = name.map((value) => value.length)
 	let counter = val(0)
 
 	function inputChanged(event) {
@@ -42,6 +42,7 @@ export function App() {
 
 	let app = (
 		<div class="App">
+			This is app!
 			<p>
 				Who are you? <input type="text" value={name} oninput={inputChanged} />
 			</p>
