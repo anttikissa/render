@@ -32,6 +32,8 @@ export function val(initialValue) {
 	return new Value(initialValue)
 }
 
+let allTopLevelElementTargets = new Map()
+
 class Element {
 	constructor(tagName, attributes, children) {
 		this.component = tagName
@@ -44,10 +46,16 @@ class Element {
 	 * @param {boolean} clear Should I clear the target node first?
 	 */
 	render(target, clear = true) {
-		let { component, attributes, children } = this
-		if (component === 'ul') {
-			log('rendering', { component, attributes, children }, 'to', target)
+		// clear: true is a signal that user is mounting us on DOM; so register this element be
+		// re-rendered when it needs to be done
+		if (clear) {
+			allTopLevelElementTargets.set(this, target)
 		}
+
+		let { component, attributes, children } = this
+		// if (component === 'ul') {
+		log('rendering', { component, attributes, children }, 'to', target)
+		// }
 
 		if (clear) {
 			target.innerHTML = ''
@@ -85,17 +93,30 @@ class Element {
 			}
 		}
 
-		for (let thing of children) {
-			if (thing instanceof Element) {
-				thing = thing.render(result, false)
+		function handleChild(thing) {
+			if (Array.isArray(thing)) {
+				for (let member of thing) {
+					handleChild(member)
+				}
+			} else if (thing instanceof Element) {
+				thing.render(result, false)
 			} else if (thing instanceof Value) {
 				let currentValue = thing.value
+
+				if (Array.isArray(currentValue)) {
+					log('!!! Value contains an Array, we should probably consider this?')
+				}
+
 				let node = document.createTextNode(currentValue)
 				result.appendChild(node)
 				thing.onChange((newValue) => (node.textContent = newValue))
 			} else {
 				result.appendChild(document.createTextNode(thing))
 			}
+		}
+
+		for (let child of children) {
+			handleChild(child)
 		}
 
 		target.appendChild(result)
@@ -106,4 +127,11 @@ class Element {
 
 export function element(tagName, attributes, ...children) {
 	return new Element(tagName, attributes, children)
+}
+
+export function reRenderEverything() {
+	for (let [element, target] of allTopLevelElementTargets.entries()) {
+		target.innerHTML = ''
+		element.render(target, false)
+	}
 }

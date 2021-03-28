@@ -4,10 +4,15 @@ import './App.css'
 
 let log = console.log
 
-import { val, element } from './framework.js'
+import { val, element, reRenderEverything } from './framework.js'
 
 function ListItem(params) {
-	return <li>I am a list item that says "{params.content}"!</li>
+	let content = params.content || 'nothing'
+
+	return <li>
+		I am a list item that says "{content}"!
+		{params._children.length ? ' and I have children: ' : ''}{params._children}
+	</li>
 }
 
 export function App() {
@@ -52,6 +57,25 @@ export function App() {
 		}
 	})
 
+	// This approach does not work for array reactivity because values inside Values can only map
+	// to a single node currently
+
+	// let listItemChildren = val([
+	// 	'This one has children, ',
+	// 	<b>what now?</b>
+	// ])
+
+	let listItemChildren = [
+		'This one has children, ',
+		<b>what now?</b>
+	]
+
+	function removeChild() {
+		listItemChildren.pop()
+		// A bit of a heavy solution
+		reRenderEverything()
+	}
+
 	let app = (
 		<div class="App">
 			This is app!
@@ -66,8 +90,9 @@ export function App() {
 			<ul>
 				<ListItem content={listItem1Content} />
 				<ListItem content={'Item #2'} />
+				<ListItem>{listItemChildren}</ListItem>
 			</ul>
-			<p>End list</p>
+			<p><button onclick={removeChild}>Remove one child</button></p>
 
 			<p>
 				Counter is {counter} <button onclick={increaseCounter}>+</button>{' '}
