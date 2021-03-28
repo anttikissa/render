@@ -9,10 +9,13 @@ import { val, element, reRenderEverything } from './framework.js'
 function ListItem(params) {
 	let content = params.content || 'nothing'
 
-	return <li>
-		I am a list item that says "{content}"!
-		{params._children.length ? ' and I have children: ' : ''}{params._children}
-	</li>
+	return (
+		<li>
+			I am a list item that says "{content}"!
+			{params._children.length ? ' and I have children: ' : ''}
+			{params._children}
+		</li>
+	)
 }
 
 export function App() {
@@ -49,7 +52,7 @@ export function App() {
 		counterInputValid.value = isValid
 	}
 
-	let listItem1Content = name.map(string => {
+	let listItem1Content = name.map((string) => {
 		if (string.length) {
 			return `Your name capitalized is "${string[0].toUpperCase()}${string.substring(1)}"`
 		} else {
@@ -67,7 +70,10 @@ export function App() {
 
 	let listItemChildren = [
 		'This one has children, ',
-		<b>what now?</b>
+		<b>Try to delete me! </b>,
+		<b>One </b>,
+		<b>Two </b>,
+		<b>Three </b>,
 	]
 
 	function removeChild() {
