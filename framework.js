@@ -15,9 +15,10 @@ class Value {
 	}
 
 	set value(newValue) {
+		let oldValue = this._value
 		this._value = newValue
 		for (let listener of this.listeners) {
-			listener(this.value)
+			listener(this.value, oldValue)
 		}
 	}
 

@@ -76,24 +76,36 @@ export function App() {
 		reRenderEverything()
 	}
 
+	name.onChange((newValue, oldValue) => {
+		if ((newValue && !oldValue) || (oldValue && !newValue)) {
+			// This does not rerender the 'name.value.length' conditional below
+			// so it's of no use; though, observe how it destroys the focus when you're typing
+			reRenderEverything()
+		}
+	})
+
 	let app = (
 		<div class="App">
 			This is app!
 			<p>
 				Who are you? <input type="text" value={name} oninput={inputChanged} />
 			</p>
-			<p class="text" style="color: blue">
-				Hi there, {name}!
-			</p>
+			{/* This does not work: :( :( - though, it IS ugly so let's invent something else */}
+			{name.value.length ? (
+				<p class="text" style="color: blue">
+					Hi there, {name}!
+				</p>
+			) : null}
 			<p>Name length: {nameLength}</p>
 			<p style="color: green">Check out this list:</p>
 			<ul>
 				<ListItem content={listItem1Content} />
 				<ListItem content={'Item #2'} />
-				<ListItem>{listItemChildren}</ListItem>
+				<ListItem>Children: {listItemChildren}</ListItem>
 			</ul>
-			<p><button onclick={removeChild}>Remove one child</button></p>
-
+			<p>
+				<button onclick={removeChild}>Remove one child</button>
+			</p>
 			<p>
 				Counter is {counter} <button onclick={increaseCounter}>+</button>{' '}
 				<button onclick={decreaseCounter}>-</button>
@@ -105,6 +117,7 @@ export function App() {
 					value={counter}
 					data-is-valid={counterInputValid}
 					oninput={counterChanged}
+					placeholder="Enter a valid number"
 				/>
 			</p>
 		</div>
