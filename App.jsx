@@ -1,10 +1,14 @@
-/** @jsx render */
+/** @jsx element */
 
 import './App.css'
 
 let log = console.log
 
-import { val, render } from './framework.js'
+import { val, element } from './framework.js'
+
+function ListItem(params) {
+	return <li>I am a list item that says "{params.content}"!</li>
+}
 
 export function App() {
 	let name = val('')
@@ -40,6 +44,14 @@ export function App() {
 		counterInputValid.value = isValid
 	}
 
+	let listItem1Content = name.map(string => {
+		if (string.length) {
+			return `Your name capitalized is "${string[0].toUpperCase()}${string.substring(1)}"`
+		} else {
+			return 'You have no name'
+		}
+	})
+
 	let app = (
 		<div class="App">
 			This is app!
@@ -50,6 +62,13 @@ export function App() {
 				Hi there, {name}!
 			</p>
 			<p>Name length: {nameLength}</p>
+			<p style="color: green">Check out this list:</p>
+			<ul>
+				<ListItem content={listItem1Content} />
+				<ListItem content={'Item #2'} />
+			</ul>
+			<p>End list</p>
+
 			<p>
 				Counter is {counter} <button onclick={increaseCounter}>+</button>{' '}
 				<button onclick={decreaseCounter}>-</button>

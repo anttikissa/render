@@ -32,18 +32,37 @@ export function val(initialValue) {
 	return new Value(initialValue)
 }
 
-export function render(tagName, attributes, ...children) {
+class Element {
+	constructor(tagName, attributes, children) {
+		this.component = tagName
+		this.attributes = attributes
+		this.children = children
+	}
+
 	/**
 	 * @param {HTMLElement} target The HTML node to contain this app
-	 * @param {HTMLElement} clear Should I clear the target node first?
+	 * @param {boolean} clear Should I clear the target node first?
 	 */
-	return function (target, clear = true) {
-		log('rendering', { tagName, attributes, children }, 'to', target)
+	render(target, clear = true) {
+		let { component, attributes, children } = this
+		if (component === 'ul') {
+			log('rendering', { component, attributes, children }, 'to', target)
+		}
 
 		if (clear) {
 			target.innerHTML = ''
 		}
-		let result = document.createElement(tagName)
+
+		let result
+
+		if (typeof component === 'function') {
+			let componentInstance = component({ ...attributes, _children: children })
+			return componentInstance.render(target, false)
+			// return component(target, false)
+		} else {
+			// <li>...</li>
+			result = document.createElement(component)
+		}
 
 		for (let attribute in attributes) {
 			let value = attributes[attribute]
@@ -66,19 +85,25 @@ export function render(tagName, attributes, ...children) {
 			}
 		}
 
-		for (let child of children) {
-			if (typeof child === 'function') {
-				child = child(result, false)
-			} else if (child instanceof Value) {
-				let currentValue = child.value
+		for (let thing of children) {
+			if (thing instanceof Element) {
+				thing = thing.render(result, false)
+			} else if (thing instanceof Value) {
+				let currentValue = thing.value
 				let node = document.createTextNode(currentValue)
 				result.appendChild(node)
-				child.onChange((newValue) => (node.textContent = newValue))
+				thing.onChange((newValue) => (node.textContent = newValue))
 			} else {
-				result.appendChild(document.createTextNode(child))
+				result.appendChild(document.createTextNode(thing))
 			}
 		}
 
 		target.appendChild(result)
+
+		return result
 	}
+}
+
+export function element(tagName, attributes, ...children) {
+	return new Element(tagName, attributes, children)
 }
