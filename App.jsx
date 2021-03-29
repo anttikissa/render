@@ -93,15 +93,25 @@ export function App() {
 	let app = (
 		<div class="App">
 			This is app!
+			<if>
+				{name.map(value => value.length)}
+				<p className="text" style="color: blue">
+					Hi there, {name}!
+				</p>
+				<p>(Optional "else" block)</p>
+			</if>
+
 			<p>
 				Who are you? <input type="text" value={name} oninput={inputChanged} />
 			</p>
 			{/* This does not work: :( :( - though, it IS ugly so let's invent something else */}
+
 			{name.value.length ? (
 				<p class="text" style="color: blue">
 					Hi there, {name}!
 				</p>
-			) : null}
+			) : <p>(Optional "else" block)</p>}
+
 			<p>Name length: {nameLength}</p>
 			<p style="color: green">Check out this list:</p>
 			<ul>
