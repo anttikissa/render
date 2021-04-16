@@ -1,6 +1,6 @@
 let log = console.log
 
-class Value {
+export class Value {
 	constructor(value) {
 		this._value = value
 		this.listeners = []
@@ -24,12 +24,12 @@ class Value {
 
 	map(f) {
 		let result = new Value(f(this.value))
-		this.onChange((newValue) => (result.value = f(newValue)))
+		this.onChange((newValue) => (log('map working on', newValue), (result.value = f(newValue))))
 		return result
 	}
 }
 
-export function val(initialValue) {
+export function value(initialValue) {
 	return new Value(initialValue)
 }
 
@@ -63,7 +63,7 @@ class Element {
 		let result
 
 		if (typeof component === 'function') {
-			let componentInstance = component({ ...attributes, _children: children })
+			let componentInstance = component({ ...attributes }, children)
 			return componentInstance.render(target, false)
 			// return component(target, false)
 		} else if (component === '') {

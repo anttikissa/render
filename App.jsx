@@ -4,9 +4,9 @@ import './App.css'
 
 let log = console.log
 
-import { val, element, fragment, reRenderEverything } from './framework.js'
+import { value, element, fragment, Value, reRenderEverything } from './framework.js'
 
-function ListItem(params) {
+function ListItem(params, children) {
 	let content = params.content || 'nothing'
 
 	return (
@@ -14,17 +14,17 @@ function ListItem(params) {
 			<li>This is a fragment</li>
 			<li>
 				I am a list item that says "{content}"!
-				{params._children.length ? ' and I have children: ' : ''}
-				{params._children}
+				{children.length ? ' and I have children: ' : ''}
+				{children}
 			</li>
 		</>
 	)
 }
 
-export function App() {
-	let name = val('')
+export function OldApp() {
+	let name = value('')
 	let nameLength = name.map((value) => value.length)
-	let counter = val(0)
+	let counter = value(0)
 
 	function inputChanged(event) {
 		name.value = event.target.value
@@ -38,7 +38,7 @@ export function App() {
 		counter.value--
 	}
 
-	let counterInputValid = val(true)
+	let counterInputValid = value(true)
 	function counterChanged(event) {
 		let value = event.target.value
 
@@ -137,4 +137,65 @@ export function App() {
 	)
 
 	return app
+}
+
+function error(message) {
+	throw new Error(message)
+}
+
+function If({ cond }, children) {
+	let [thenBlock, elseBlock] = children
+
+	if (typeof cond === 'undefined') {
+		error('If: attribute cond missing')
+	}
+
+	if (cond instanceof Value) {
+		cond.onChange((newCond) => {
+			// TODO make the thing change when condition changes somehow
+			log('If: condition changed', newCond)
+		})
+	} else {
+		if (cond) {
+			return thenBlock
+		} else {
+			return elseBlock
+		}
+	}
+
+	return <div>TODO this needs to change</div>
+}
+
+export function App() {
+	function toggleLoggedIn() {
+		isLoggedIn.value = !isLoggedIn.value
+		userProfile.value = isLoggedIn.value
+			? {
+					userId: 123,
+					name: 'Antti',
+			  }
+			: null
+
+		reRenderEverything()
+	}
+
+	let isLoggedIn = value(false)
+	let userProfile = value(null)
+
+	let userId = userProfile.map((u) => u && u.userId)
+	let name = userProfile.map((u) => u && u.name)
+
+	return (
+		<div class="App">
+			<button onclick={toggleLoggedIn}>Toggle logged in</button>
+			<br />
+			User logged in? {isLoggedIn}
+			<If cond={isLoggedIn}>
+				<div>
+					This is the THEN part. User {userId}, name {name}
+				</div>
+				<div>This is the ELSE part. (You are not logged in)</div>
+			</If>
+		</div>
+	)
 }

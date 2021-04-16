@@ -1,12 +1,12 @@
 .App {
     font-style: italic;
-    border: 1px solid;
+    font-family: Helvetica, sans-serif;
+    border: 1px solid #ccc;
     padding: 10px;
-    border-radius: 10px;
+    background: #eee;
 }
 
 .App input {
-    /*--color: #eee;*/
     background: var(--color);
     border: 1px solid;
 }
