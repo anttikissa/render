@@ -166,6 +166,13 @@ function If({ cond }, children) {
 	return <div>TODO this needs to change</div>
 }
 
+function Counter() {
+	let result = value(1)
+	setInterval(() => result.value++, 500)
+
+	return <p>{result}</p>
+}
+
 export function App() {
 	function toggleLoggedIn() {
 		isLoggedIn.value = !isLoggedIn.value
@@ -187,6 +194,8 @@ export function App() {
 
 	return (
 		<div class="App">
+			Counter: <Counter></Counter>
+
 			<button onclick={toggleLoggedIn}>Toggle logged in</button>
 			<br />
 			User logged in? {isLoggedIn}
