@@ -1,20 +1,23 @@
-/** @jsx element */
+/** @jsx element @jsxFrag fragment */
 
 import './App.css'
 
 let log = console.log
 
-import { val, element, reRenderEverything } from './framework.js'
+import { val, element, fragment, reRenderEverything } from './framework.js'
 
 function ListItem(params) {
 	let content = params.content || 'nothing'
 
 	return (
-		<li>
-			I am a list item that says "{content}"!
-			{params._children.length ? ' and I have children: ' : ''}
-			{params._children}
-		</li>
+		<>
+			<li>This is a fragment</li>
+			<li>
+				I am a list item that says "{content}"!
+				{params._children.length ? ' and I have children: ' : ''}
+				{params._children}
+			</li>
+		</>
 	)
 }
 
@@ -65,7 +68,10 @@ export function App() {
 
 	// let listItemChildren = val([
 	// 	'This one has children, ',
-	// 	<b>what now?</b>
+	// 	<b>Try to delete me! </b>,
+	// 	<b>One </b>,
+	// 	<b>Two </b>,
+	// 	<b>Three </b>,
 	// ])
 
 	let listItemChildren = [
@@ -82,36 +88,27 @@ export function App() {
 		reRenderEverything()
 	}
 
-	name.onChange((newValue, oldValue) => {
-		if ((newValue && !oldValue) || (oldValue && !newValue)) {
-			// This does not rerender the 'name.value.length' conditional below
-			// so it's of no use; though, observe how it destroys the focus when you're typing
-			reRenderEverything()
-		}
-	})
+	// name.onChange((newValue, oldValue) => {
+	// 	if ((newValue && !oldValue) || (oldValue && !newValue)) {
+	// 		// This does not rerender the 'name.value.length' conditional below
+	// 		// so it's of no use; though, observe how it destroys the focus when you're typing
+	// 		reRenderEverything()
+	// 	}
+	// })
 
 	let app = (
 		<div class="App">
 			This is app!
 			<if>
-				{name.map(value => value.length)}
+				{name.map((value) => value.length)}
 				<p className="text" style="color: blue">
 					Hi there, {name}!
 				</p>
 				<p>(Optional "else" block)</p>
 			</if>
-
 			<p>
 				Who are you? <input type="text" value={name} oninput={inputChanged} />
 			</p>
-			{/* This does not work: :( :( - though, it IS ugly so let's invent something else */}
-
-			{name.value.length ? (
-				<p class="text" style="color: blue">
-					Hi there, {name}!
-				</p>
-			) : <p>(Optional "else" block)</p>}
-
 			<p>Name length: {nameLength}</p>
 			<p style="color: green">Check out this list:</p>
 			<ul>

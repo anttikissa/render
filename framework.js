@@ -54,9 +54,7 @@ class Element {
 		}
 
 		let { component, attributes, children } = this
-		// if (component === 'ul') {
 		log('rendering', { component, attributes, children }, 'to', target)
-		// }
 
 		if (clear) {
 			target.innerHTML = ''
@@ -68,29 +66,35 @@ class Element {
 			let componentInstance = component({ ...attributes, _children: children })
 			return componentInstance.render(target, false)
 			// return component(target, false)
+		} else if (component === '') {
+			// fragment
+			result = target
 		} else {
 			// <li>...</li>
 			result = document.createElement(component)
+			target.appendChild(result)
 		}
 
-		for (let attribute in attributes) {
-			let value = attributes[attribute]
-			// event handlers must be set directly instead of setAttribute
-			if (attribute.startsWith('on')) {
-				result[attribute] = value
-			} else if (value instanceof Value) {
-				let currentValue = value.value
-				result.setAttribute(attribute, currentValue)
-				value.onChange((newValue) => {
-					result.setAttribute(attribute, newValue)
-					// Input elements stop obeying the attribute after the property has
-					// once been changed, so this needs to be done:
-					if (attribute === 'value' && result instanceof HTMLInputElement) {
-						result.value = newValue
-					}
-				})
-			} else {
-				result.setAttribute(attribute, value)
+		if (attributes) {
+			for (let attribute in attributes) {
+				let value = attributes[attribute]
+				// event handlers must be set directly instead of setAttribute
+				if (attribute.startsWith('on')) {
+					result[attribute] = value
+				} else if (value instanceof Value) {
+					let currentValue = value.value
+					result.setAttribute(attribute, currentValue)
+					value.onChange((newValue) => {
+						result.setAttribute(attribute, newValue)
+						// Input elements stop obeying the attribute after the property has
+						// once been changed, so this needs to be done:
+						if (attribute === 'value' && result instanceof HTMLInputElement) {
+							result.value = newValue
+						}
+					})
+				} else {
+					result.setAttribute(attribute, value)
+				}
 			}
 		}
 
@@ -120,8 +124,6 @@ class Element {
 			handleChild(child)
 		}
 
-		target.appendChild(result)
-
 		return result
 	}
 }
@@ -129,6 +131,8 @@ class Element {
 export function element(tagName, attributes, ...children) {
 	return new Element(tagName, attributes, children)
 }
+
+export const fragment = ''
 
 export function reRenderEverything() {
 	for (let [element, target] of allTopLevelElementTargets.entries()) {
