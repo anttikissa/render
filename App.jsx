@@ -150,10 +150,14 @@ function If({ cond }, children) {
 		error('If: attribute cond missing')
 	}
 
+
 	if (cond instanceof Value) {
-		cond.onChange((newCond) => {
-			// TODO make the thing change when condition changes somehow
-			log('If: condition changed', newCond)
+		return cond.map(newCond => {
+			if (newCond) {
+				return thenBlock
+			} else {
+				return elseBlock
+			}
 		})
 	} else {
 		if (cond) {
@@ -162,8 +166,6 @@ function If({ cond }, children) {
 			return elseBlock
 		}
 	}
-
-	return <div>TODO this needs to change</div>
 }
 
 function Counter(args) {
@@ -205,23 +207,16 @@ export function App() {
 
 	return (
 		<div class="App">
-			<p>Counters will disappear when divisible by 5:</p>
-			<p>Counter 1:</p>
-			<Counter initial={0}/>
-			<p>Counter 2:</p>
-			<Counter initial={2}/>
-			<p>Counter 3:</p>
-			<Counter initial={7}/>
-
-			{/*<button onclick={toggleLoggedIn}>Toggle logged in</button>*/}
-			{/*<br />*/}
-			{/*User logged in? {isLoggedIn}*/}
-			{/*<If cond={isLoggedIn}>*/}
-			{/*	<div>*/}
-			{/*		This is the THEN part. User {userId}, name {name}*/}
-			{/*	</div>*/}
-			{/*	<div>This is the ELSE part. (You are not logged in)</div>*/}
-			{/*</If>*/}
+			<p>
+				<button onclick={toggleLoggedIn}>Toggle logged in</button>
+			</p>
+			<p>User logged in? {isLoggedIn}</p>
+			<If cond={isLoggedIn}>
+				<div>
+					This is the THEN part. User {userId}, name {name}
+				</div>
+				<div>This is the ELSE part. (You are not logged in)</div>
+			</If>
 		</div>
 	)
 }
