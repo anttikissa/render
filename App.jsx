@@ -85,6 +85,7 @@ export function OldApp() {
 	function removeChild() {
 		listItemChildren.pop()
 		// A bit of a heavy solution
+		// (AND does not work, since re-rendering OldApp recreates its Values as well)
 		reRenderEverything()
 	}
 
@@ -99,16 +100,15 @@ export function OldApp() {
 	let app = (
 		<div class="App">
 			This is app!
-			<if>
-				{name.map((value) => value.length)}
-				<p className="text" style="color: blue">
-					Hi there, {name}!
-				</p>
-				<p>(Optional "else" block)</p>
-			</if>
 			<p>
 				Who are you? <input type="text" value={name} oninput={inputChanged} />
 			</p>
+			<If cond={name.map((value) => value.length)}>
+				<p className="text" style="color: blue">
+					Hi there, {name}!
+				</p>
+				<p>Please type in your name (this is the else block)</p>
+			</If>
 			<p>Name length: {nameLength}</p>
 			<p style="color: green">Check out this list:</p>
 			<ul>
@@ -150,9 +150,8 @@ function If({ cond }, children) {
 		error('If: attribute cond missing')
 	}
 
-
 	if (cond instanceof Value) {
-		return cond.map(newCond => {
+		return cond.map((newCond) => {
 			if (newCond) {
 				return thenBlock
 			} else {
@@ -207,16 +206,41 @@ export function App() {
 
 	return (
 		<div class="App">
+
+			<p>This was the old app:</p>
+
+			<OldApp />
+
+			<p>
+				<b>Toggle login test</b>
+			</p>
 			<p>
 				<button onclick={toggleLoggedIn}>Toggle logged in</button>
 			</p>
 			<p>User logged in? {isLoggedIn}</p>
+
 			<If cond={isLoggedIn}>
 				<div>
 					This is the THEN part. User {userId}, name {name}
 				</div>
 				<div>This is the ELSE part. (You are not logged in)</div>
 			</If>
+
+			<hr />
+
+			<p>
+				<b>Counters:</b>
+			</p>
+			<p>Counters will disappear when divisible by 5:</p>
+			<p>Counter 1:</p>
+			<Counter initial={0} />
+			<p>Counter 2:</p>
+			<Counter initial={2} />
+			<p>Counter 3:</p>
+			<Counter initial={7} />
+
+			<hr />
+
 		</div>
 	)
 }
