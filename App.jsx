@@ -167,10 +167,16 @@ function If({ cond }, children) {
 }
 
 function Counter() {
-	let result = value(1)
-	setInterval(() => result.value++, 500)
+	let counter = value(1)
+	setInterval(() => counter.value++, 1500)
 
-	return <p>{result}</p>
+	return counter.map((value) => {
+		if (value % 2 === 0) {
+			return <p style="color: blue">{value} is even</p>
+		} else {
+			return <p style="font-weight: bold">{value} is odd</p>
+		}
+	})
 }
 
 export function App() {
@@ -196,15 +202,15 @@ export function App() {
 		<div class="App">
 			Counter: <Counter></Counter>
 
-			<button onclick={toggleLoggedIn}>Toggle logged in</button>
-			<br />
-			User logged in? {isLoggedIn}
-			<If cond={isLoggedIn}>
-				<div>
-					This is the THEN part. User {userId}, name {name}
-				</div>
-				<div>This is the ELSE part. (You are not logged in)</div>
-			</If>
+			{/*<button onclick={toggleLoggedIn}>Toggle logged in</button>*/}
+			{/*<br />*/}
+			{/*User logged in? {isLoggedIn}*/}
+			{/*<If cond={isLoggedIn}>*/}
+			{/*	<div>*/}
+			{/*		This is the THEN part. User {userId}, name {name}*/}
+			{/*	</div>*/}
+			{/*	<div>This is the ELSE part. (You are not logged in)</div>*/}
+			{/*</If>*/}
 		</div>
 	)
 }

@@ -1,4 +1,8 @@
 let log = console.log
+let error = (message, ...rest) => {
+	log('ERROR', message, ...rest)
+	throw new Error(message)
+}
 
 export class Value {
 	constructor(value) {
@@ -24,11 +28,14 @@ export class Value {
 
 	map(f) {
 		let result = new Value(f(this.value))
-		this.onChange((newValue) => (log('map working on', newValue), (result.value = f(newValue))))
+		this.onChange((newValue) => (result.value = f(newValue)))
 		return result
 	}
 }
 
+// TODO figure out a better name
+// stream() or observable() or reactive() or whatever.
+// This gets confused with v.value and the argument for onChange(value => ...)
 export function value(initialValue) {
 	return new Value(initialValue)
 }
@@ -45,6 +52,12 @@ class Element {
 	/**
 	 * @param {HTMLElement} target The HTML node to contain this app
 	 * @param {boolean} clear Should I clear the target node first?
+	 *
+	 * TODO the logic got fuzzy soon, sometimes target can be null meaning it doesn't need to
+	 * be appended there. The creation of the element and adding it to the tree should be separate
+	 * operations probably.
+	 *
+	 * @return {HTMLElement}
 	 */
 	render(target, clear = true) {
 		// clear: true is a signal that user is mounting us on DOM; so register this element be
@@ -63,16 +76,60 @@ class Element {
 		let result
 
 		if (typeof component === 'function') {
-			let componentInstance = component({ ...attributes }, children)
-			return componentInstance.render(target, false)
-			// return component(target, false)
+			// It's a Component, instantiate it with elements and
+			let componentResult = component({ ...attributes }, children)
+
+			if (componentResult instanceof Value) {
+				log('!!! Encountered a Value componentInstance')
+				// TODO:
+				// Make it so that there is something in DOM (comment element if nothing else)
+				// whenever the value changes, replace the DOM element in question with
+				// whatever is the new value
+
+				let node = null
+
+				if (componentResult.value) {
+					if (componentResult.value instanceof Element) {
+						node = componentResult.value.render(null, false)
+					} else {
+						error('value not Element', componentResult.value)
+					}
+				} else {
+					node = document.createComment('placeholder')
+				}
+
+				componentResult.onChange((newValue) => {
+					if (newValue instanceof Element) {
+						let newNode = newValue.render(null, false)
+
+						if (target) {
+							target.replaceChild(newNode, node)
+							node = newNode
+						}
+					} else {
+						error('value not Element', newValue)
+					}
+				})
+
+				if (target) {
+					target.appendChild(node)
+				}
+				return node
+			} else if (componentResult instanceof Element) {
+				return componentResult.render(target, false)
+			} else {
+				log('componentResult was not Value or Element', componentResult)
+				error('componentResult was not Value or Element')
+			}
 		} else if (component === '') {
 			// fragment
 			result = target
 		} else {
 			// <li>...</li>
 			result = document.createElement(component)
-			target.appendChild(result)
+			if (target) {
+				target.appendChild(result)
+			}
 		}
 
 		if (attributes) {
