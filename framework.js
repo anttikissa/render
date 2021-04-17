@@ -86,28 +86,32 @@ class Element {
 				// whenever the value changes, replace the DOM element in question with
 				// whatever is the new value
 
-				let node = null
-
-				if (componentResult.value) {
-					if (componentResult.value instanceof Element) {
-						node = componentResult.value.render(null, false)
+				/**
+				 * Create a HTML node out of anything (null/undefined creates a placeholder
+				 * comment node, Elements will be rendered)
+				 *
+				 * TODO maybe handle strings as well if needed?
+				 * @param someValue
+				 * @return {Node}
+				 */
+				let createNodeFrom = (someValue) => {
+					if (someValue == null) {
+						return document.createComment('placeholder')
+					} else if (someValue instanceof Element) {
+						return someValue.render(null, false)
 					} else {
-						error('value not Element', componentResult.value)
+						error('unknown type for someValue', someValue)
 					}
-				} else {
-					node = document.createComment('placeholder')
 				}
 
-				componentResult.onChange((newValue) => {
-					if (newValue instanceof Element) {
-						let newNode = newValue.render(null, false)
+				let node = createNodeFrom(componentResult.value)
 
-						if (target) {
-							target.replaceChild(newNode, node)
-							node = newNode
-						}
-					} else {
-						error('value not Element', newValue)
+				componentResult.onChange((newValue) => {
+					let newNode = createNodeFrom(newValue)
+
+					if (target) {
+						target.replaceChild(newNode, node)
+						node = newNode
 					}
 				})
 

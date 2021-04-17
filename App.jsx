@@ -166,15 +166,20 @@ function If({ cond }, children) {
 	return <div>TODO this needs to change</div>
 }
 
-function Counter() {
-	let counter = value(1)
-	setInterval(() => counter.value++, 1500)
+function Counter(args) {
+	let initial = args.initial || 0
+	let counter = value(initial)
+	setInterval(() => counter.value++, 2000)
 
 	return counter.map((value) => {
+		// Sometimes make the value not exist to see how the framework will cope
+		if (value % 5 === 0) {
+			return null
+		}
 		if (value % 2 === 0) {
-			return <p style="color: blue">{value} is even</p>
+			return <p style="color: blue">{value} is even and therefore blue</p>
 		} else {
-			return <p style="font-weight: bold">{value} is odd</p>
+			return <p style="font-weight: bold">{value} is odd and therefore bold</p>
 		}
 	})
 }
@@ -200,7 +205,13 @@ export function App() {
 
 	return (
 		<div class="App">
-			Counter: <Counter></Counter>
+			<p>Counters will disappear when divisible by 5:</p>
+			<p>Counter 1:</p>
+			<Counter initial={0}/>
+			<p>Counter 2:</p>
+			<Counter initial={2}/>
+			<p>Counter 3:</p>
+			<Counter initial={7}/>
 
 			{/*<button onclick={toggleLoggedIn}>Toggle logged in</button>*/}
 			{/*<br />*/}
